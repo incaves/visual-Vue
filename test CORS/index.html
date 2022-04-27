@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="./jquery.min.js"></script>
+</head>
+<body>
+    <button>测试</button>
+    <script>
+       $('button').click(function(){
+          // 发起请求的url http://127.0.0.1:3333/api/map
+          // html文件的地址 http://127.0.0.1:5500/index.html
+          $.ajax({
+             type:"get",
+             url:'http://127.0.0.1:3333/api/map',
+             success:function(data){
+               console.log(data);
+             }
+          })
+       })
+    </script>
+</body>
+</html>
