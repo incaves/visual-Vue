@@ -18,6 +18,10 @@ app.use(resHaderMiddleware)
 const resDataMiddleware = require('./middleware/data')
 app.use(resDataMiddleware)
 
-
 // 3.绑定端口号
 app.listen(3333)
+
+const WebSocketService = require('./service/websocket')
+// 开启服务端的监听 监听客户端的连接
+// 当某一个客户端连接成功之后 就会对这个客户端进行message事件的监听
+WebSocketService.linsten()

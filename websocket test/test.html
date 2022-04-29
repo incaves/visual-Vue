@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="connect">连接服务端</button>
+    <button id="send" disabled="true">发送数据给服务端</button> <br />
+    <div>
+      从服务端接受的数据如下 <br />
+      <span id="recv"></span>
+    </div>
+    <script>
+      var connect = document.querySelector('#connect');
+      var send = document.querySelector('#send');
+      var recv = document.querySelector('#recv');
+      let ws = null;
+      // 连接
+      connect.onclick = function () {
+        ws = new WebSocket('ws://localhost:9998');
+        ws.onopen = () => {
+          console.log('连接服务端成功');
+          // 没有点击链接服务端 按钮时禁用状态
+          send.disabled = false; // 关闭禁用状态
+        };
+        ws.onclose = () => {
+          console.log('连接服务端失败');
+          send.disabled = true; // 开启禁用状态
+        };
+        ws.onmessage = (msg) => {
+          console.log('接受到服务端发送过来的数据了');
+          recv.innerHTML = msg.data;
+        };
+      };
+      // 发送
+      send.onclick = function () {
+        // ws.send('hello socket from frontend')
+        ws.send(
+          JSON.stringify({
+            // getData 数据
+            // fullScreen 全屏
+            // themeChange 主题
+            action: 'themeChange',
+            socketType: 'themeChange',
+            chartName: '',
+            value: 'chalk',
+          })
+        );
+      };
+    </script>
+  </body>
+</html>

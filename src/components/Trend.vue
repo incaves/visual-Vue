@@ -23,8 +23,17 @@ export default {
       titleFontSize: 0 // 标题的字体大小
     }
   },
+  created () {
+    this.$socket.registerCallBack('trendData', this.getData)
+  },
   mounted () {
     this.initChart()
+    this.$socket.send({
+      action: 'getData',
+      socketType: 'trendData',
+      chartName: 'trend',
+      value: ''
+    })
     this.getData()
     window.addEventListener('resize', this.screenAdapter)
     this.screenAdapter()
@@ -97,8 +106,8 @@ export default {
       this.chartInstance.setOption(initOption)
     },
     // 获取服务器数据
-    async getData () {
-      const { data: res } = await this.$http.get('/trend')
+    async getData (res) {
+      // const { data: res } = await this.$http.get('/trend')
       this.allData = res
       this.updateChart() // 更新图表
     },
@@ -121,7 +130,7 @@ export default {
         'rgba(250, 105, 0, 0)'
       ]
       // 类目轴  -月,二月..
-      const timeArr = this.allData.common.month
+      const month = this.allData.common.month
       // Y轴的数据 serise的数据
       const valueArr = this.allData[this.choiceType].data
       // 每一条数据
@@ -151,7 +160,7 @@ export default {
       // 设置数据
       const DataOption = {
         xAxis: {
-          data: timeArr
+          data: month
         },
         legend: {
           data: legendArr
@@ -191,6 +200,7 @@ export default {
   // 组件被销毁时 卸载
   destroyed () {
     window.removeEventListener('resize', this.screenAdapter)
+    this.$socket.unRegiserCallBack('trendData')
   }
 }
 </script>

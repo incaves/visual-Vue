@@ -4,6 +4,14 @@ Vue.use(VueRouter)
 
 const routes = [
   {
+    path: '/',
+    redirect: '/screen'
+  },
+  {
+    path: '/screen',
+    component: () => import('../views/ScreenPage')
+  },
+  {
     path: '/seller',
     component: () => import('../views/SellerPage')
   },
@@ -18,6 +26,14 @@ const routes = [
   {
     path: '/rank',
     component: () => import('../views/RankPage')
+  },
+  {
+    path: '/hot',
+    component: () => import('../views/HotPage')
+  },
+  {
+    path: '/stock',
+    component: () => import('../views/StockPage')
   }
 ]
 
