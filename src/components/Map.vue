@@ -7,6 +7,7 @@
 <script>
 import axios from 'axios'
 import { getProvinceMapInfo } from '@/utils/conversion'
+import { mapState } from 'vuex'
 export default {
   name: 'Map',
   data () {
@@ -22,10 +23,21 @@ export default {
     window.addEventListener('resize', this.screenAdapter)
     this.screenAdapter()
   },
+  computed: {
+    ...mapState(['theme'])
+  },
+  watch: {
+    theme () {
+      this.chartInstance.dispose() // 销毁当前图表
+      this.initChart() // 重新获取最新的主题
+      this.screenAdapter() // 完成屏幕适配
+      this.updateChart() // 更新图标数据
+    }
+  },
   methods: {
     // 初始化ehartInstance对象 并保存到data中
     async initChart () {
-      this.chartInstance = this.$echarts.init(this.$refs.MapRef, 'chalk')
+      this.chartInstance = this.$echarts.init(this.$refs.MapRef, this.theme)
       // 获取地图矢量数据
       const res = await axios.get('http://localhost:7777/static/map/china.json')
       this.$echarts.registerMap('china', res.data) // 注册地图数据
@@ -125,8 +137,7 @@ export default {
           itemHeight: titleFontSize / 2,
           itemGap: titleFontSize / 2,
           textStyle: {
-            fontSize: titleFontSize / 3,
-            color: '#fff'
+            fontSize: titleFontSize / 3
           }
         }
       }

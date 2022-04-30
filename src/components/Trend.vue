@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import { getThemeValue } from '@/utils/themeSize'
 export default {
   name: 'Trend',
   data () {
@@ -24,22 +26,23 @@ export default {
     }
   },
   created () {
-    this.$socket.registerCallBack('trendData', this.getData)
+    // this.$socket.registerCallBack('trendData', this.getData)
   },
   mounted () {
     this.initChart()
-    this.$socket.send({
-      action: 'getData',
-      socketType: 'trendData',
-      chartName: 'trend',
-      value: ''
-    })
+    // this.$socket.send({
+    //   action: 'getData',
+    //   socketType: 'trendData',
+    //   chartName: 'trend',
+    //   value: ''
+    // })
     this.getData()
     window.addEventListener('resize', this.screenAdapter)
     this.screenAdapter()
     console.log(this.titleFontSize)
   },
   computed: {
+    ...mapState(['theme']),
     // 标题栏下拉框 简化操作
     selectType () {
       if (!this.allData) { // 不存在
@@ -63,20 +66,30 @@ export default {
     // 设置给标题的样式
     comStyle () {
       return {
-        fontSize: this.titleFontSize + 'px' // screenAdapter函数获取
+        fontSize: this.titleFontSize + 'px', // screenAdapter函数获取
+        color: getThemeValue(this.theme).titleColor
       }
     },
     // 加了竖线 下拉框不对称
     marginStyle () {
       return {
-        marginLeft: this.titleFontSize + 'px'
+        marginLeft: this.titleFontSize + 'px',
+        color: getThemeValue(this.theme).titleColor
       }
+    }
+  },
+  watch: {
+    theme () {
+      this.chartInstance.dispose() // 销毁当前图表
+      this.initChart() // 重新获取最新的主题
+      this.screenAdapter() // 完成屏幕适配
+      this.updateChart() // 更新图标数据
     }
   },
   methods: {
     // 初始化ehartInstance对象 并保存到data中
     initChart () {
-      this.chartInstance = this.$echarts.init(this.$refs.TrendRef, 'chalk')
+      this.chartInstance = this.$echarts.init(this.$refs.TrendRef, this.theme)
       // 设置图标的样式
       const initOption = {
         grid: {
@@ -106,8 +119,9 @@ export default {
       this.chartInstance.setOption(initOption)
     },
     // 获取服务器数据
-    async getData (res) {
-      // const { data: res } = await this.$http.get('/trend')
+    // async getData (res) {
+    async getData () {
+      const { data: res } = await this.$http.get('/trend')
       this.allData = res
       this.updateChart() // 更新图表
     },
@@ -180,8 +194,7 @@ export default {
           itemHeight: this.titleFontSize,
           itemGap: this.titleFontSize, // 间距
           textStyle: {
-            fontSize: this.titleFontSize / 2, // 标题的大小
-            color: '#fff'
+            fontSize: this.titleFontSize / 2 // 标题的大小
           }
         }
       }

@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'Seller',
   data () {
@@ -24,11 +25,22 @@ export default {
     window.addEventListener('resize', this.screenAdapter)
     this.screenAdapter() // 上来接挂载
   },
+  computed: {
+    ...mapState(['theme'])
+  },
+  watch: {
+    theme () {
+      this.chartInstance.dispose() // 销毁当前图表
+      this.initChart() // 重新获取最新的主题
+      this.screenAdapter() // 完成屏幕适配
+      this.updateChart() // 更新图标数据
+    }
+  },
   methods: {
     // 初始化ehartInstance对象 并保存到data中
     initChart () {
       // 获取DOM 并引入主题
-      this.chartInstance = this.$echarts.init(this.$refs.SellerRef, 'chalk')
+      this.chartInstance = this.$echarts.init(this.$refs.SellerRef, this.theme)
       // 对图表初始化的控制样式等等
       const initOption = {
         title: { // 标题

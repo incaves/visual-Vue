@@ -22,6 +22,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import { getThemeValue } from '../utils/themeSize'
 export default {
   name: 'Hot',
   data () {
@@ -33,6 +35,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['theme']),
     // 显示每个名称在右下角
     HotTitle () {
       if (!this.allData) {
@@ -45,8 +48,18 @@ export default {
     // 控制箭头的大小
     iconStyle () {
       return {
-        fontSize: this.titleFontSize + 'px'
+        fontSize: this.titleFontSize + 'px',
+        //  把主题传递过去
+        color: getThemeValue(this.theme).titleColor
       }
+    }
+  },
+  watch: {
+    theme () {
+      this.chartInstance.dispose() // 销毁当前图表
+      this.initChart() // 重新获取最新的主题
+      this.screenAdapter() // 完成屏幕适配
+      this.updateChart() // 更新图标数据
     }
   },
   mounted () {
@@ -58,7 +71,7 @@ export default {
   methods: {
     // 初始化ehartInstance对象 并保存到data中
     initChart () {
-      this.chartInstance = this.$echarts.init(this.$refs.HotRef, 'chalk')
+      this.chartInstance = this.$echarts.init(this.$refs.HotRef, this.theme)
       // 设置图表的样式
       const initOption = {
         title: {
@@ -159,12 +172,11 @@ export default {
           }
         },
         legend: {
-          itemWidth: this.titleFontSize / 2,
-          itemHeight: this.titleFontSize / 2,
+          itemWidth: this.titleFontSize,
+          itemHeight: this.titleFontSize,
           itemGap: this.titleFontSize,
           textStyle: {
-            fontSize: this.titleFontSize / 2,
-            color: '#fff'
+            fontSize: this.titleFontSize / 2
           }
         },
         series: [

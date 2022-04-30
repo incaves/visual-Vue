@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'Trend',
   data () {
@@ -22,10 +23,21 @@ export default {
     window.addEventListener('resize', this.screenAdapter)
     this.screenAdapter()
   },
+  computed: {
+    ...mapState(['theme'])
+  },
+  watch: {
+    theme () {
+      this.chartInstance.dispose() // 销毁当前图表
+      this.initChart() // 重新获取最新的主题
+      this.screenAdapter() // 完成屏幕适配
+      this.updateChart() // 更新图标数据
+    }
+  },
   methods: {
     // 初始化ehartInstance对象 并保存到data中
     initChart () {
-      this.chartInstance = this.$echarts.init(this.$refs.RankRef, 'chalk')
+      this.chartInstance = this.$echarts.init(this.$refs.RankRef, this.theme)
       // 设置图标的样式
       const initOption = {
         title: {

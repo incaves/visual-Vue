@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'Stock',
   data () {
@@ -15,16 +16,28 @@ export default {
       timerId: null // 定时器的标识
     }
   },
+  computed: {
+    ...mapState(['theme'])
+  },
+  watch: {
+    theme () {
+      this.chartInstance.dispose() // 销毁当前图表
+      this.initChart() // 重新获取最新的主题
+      this.screenAdapter() // 完成屏幕适配
+      this.updateChart() // 更新图标数据
+    }
+  },
   mounted () {
     this.initChart()
     this.getData()
     window.addEventListener('resize', this.screenAdapter)
     this.screenAdapter()
+    this.updateChart()
   },
   methods: {
     // 初始化ehartInstance对象 并保存到data中
     initChart () {
-      this.chartInstance = this.$echarts.init(this.$refs.StockRef, 'chalk')
+      this.chartInstance = this.$echarts.init(this.$refs.StockRef, this.theme)
       // 设置图表的样式
       const initOption = {
         title: {
@@ -71,7 +84,7 @@ export default {
       const seriesArr = showData.map((item, index) => {
         return {
           type: 'pie', // 饼图
-          radius: [110, 100], // 设置为圆环图
+          // radius: [50, 50], // 设置为圆环图
           center: centerArr[index], // 坐标
           hoverAnimation: false, // 关闭鼠标移入饼图的动画效果
           labelLine: {
@@ -84,7 +97,7 @@ export default {
           data: [
             {
               // 销量
-              name: item.name + '\n' + item.sales,
+              name: item.name + '\n\n' + item.sales,
               value: item.sales,
               itemStyle: {
                 // 渐变色的设置
@@ -120,8 +133,8 @@ export default {
     screenAdapter () {
       const titleFontSize = (this.$refs.StockRef.offsetWidth / 100) * 3.6
       // 设置标题等可响应的数据
-      const innerRadis = titleFontSize * 2 // 外圆半径
-      const outterRadis = titleFontSize * 1.125 // 内圆半径
+      const innerRadis = titleFontSize * 2.8 // 外圆半径
+      const outterRadis = innerRadis * 1.2 // 内圆半径
       // 圆形的半径 和内容的字体大小的设置
       const adapterOption = {
         title: {
@@ -134,35 +147,35 @@ export default {
             type: 'pie',
             radius: [outterRadis, innerRadis],
             label: {
-              fontSize: titleFontSize / 2
+              fontSize: titleFontSize / 1.2
             }
           },
           {
             type: 'pie',
             radius: [outterRadis, innerRadis],
             label: {
-              fontSize: titleFontSize / 2
+              fontSize: titleFontSize / 1.2
             }
           },
           {
             type: 'pie',
             radius: [outterRadis, innerRadis],
             label: {
-              fontSize: titleFontSize / 2
+              fontSize: titleFontSize / 1.2
             }
           },
           {
             type: 'pie',
             radius: [outterRadis, innerRadis],
             label: {
-              fontSize: titleFontSize / 2
+              fontSize: titleFontSize / 1.2
             }
           },
           {
             type: 'pie',
             radius: [outterRadis, innerRadis],
             label: {
-              fontSize: titleFontSize / 2
+              fontSize: titleFontSize / 1.2
             }
           }
         ]
